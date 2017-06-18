@@ -18,8 +18,35 @@
     #contentArea {
         margin: 200px;
     }
+    
+    .centered {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transform: -webkit-translate(-50%, -50%);
+        transform: -moz-translate(-50%, -50%);
+        transform: -ms-translate(-50%, -50%);
+    }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/3.6.6/firebase.js"></script>
+    <!-- AngularFire -->
+    <script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
+    <script>
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyA8lq9sgFNGWFCzPcOn60YbyX2gk6caza0",
+        authDomain: "jobwaki.firebaseapp.com",
+        databaseURL: "https://jobwaki.firebaseio.com",
+        projectId: "jobwaki",
+        storageBucket: "",
+        messagingSenderId: "643537213620"
+    };
+    firebase.initializeApp(config);
+    </script>
 </head>
 
 <body ng-controller="MainCtrl">
@@ -39,20 +66,26 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
         <div class="container">
-            <div class="row">
-                <div class="messageArea jumbotron">
-                    <div class="row" ng-repeat="messages in messages">
-                        <strong>{{messages.messenger}}:</strong>{{messages.message}}
+            <div id="botArea" ng-show="botarea">
+                <div class="row">
+                    <div class="messageArea jumbotron">
+                        <div class="row" ng-repeat="messages in messages">
+                            <strong>{{messages.messenger}}:</strong>{{messages.message}}
+                        </div>
                     </div>
                 </div>
+                <div class="row">
+                    <form>
+                        <div class="form-group">
+                            <input type="text" ng-model="input" placeholder="Identify" class="form-control col-lg-12">
+                            <button ng-click="inputcommand()">Submit</button>
+                            <button ng-click="logout()">Logout</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="row">
-                <form>
-                    <div class="form-group">
-                        <input type="text" ng-model="input" placeholder="Identify" class="form-control col-lg-12">
-                        <button ng-click="inputcommand()">Submit</button>
-                    </div>
-                </form>
+            <div class="row centered" ng-show="loginbutton">
+                <button ng-click="googleLogin()">Login through Google</button>
             </div>
         </div>
     </div>
@@ -65,9 +98,30 @@
     </div>
     <!-- /container -->
     <script>
-    angular.module('rxAi', [])
-        .controller('MainCtrl', function($scope) {
+    angular.module('rxAi', ["firebase"])
+        .controller('MainCtrl', function($scope, $firebaseAuth, $window,$timeout) {
+            var auth = $firebaseAuth();
+            $scope.botarea = false;
+            $scope.loginbutton = true;
+            $scope.logout = function(){
+                firebase.auth().signOut().then(function() {
+                  // Sign-out successful.
+                  $window.location = "";
+                }, function(error) {
+                  // An error happened.
+                });
+            }
+            $scope.googleLogin = function() {
 
+                // login with Google
+                auth.$signInWithPopup("google").then(function(firebaseUser) {
+                    console.log("Signed in as:", firebaseUser);
+                    $window.location = "";
+                    $scope.loginbutton = false;
+                }).catch(function(error) {
+                    console.log("Authentication failed:", error);
+                });
+            }
             word = {
                 "Noun": {
                     "description": "identifier of a word",
@@ -247,14 +301,14 @@
                 "message": "Unsa imo gusto e identify?"
             }];
 
-            
+
 
 
 
             $scope.RxAI = {
-            	"neurons":{
+                "neurons": {
 
-            	},
+                },
                 "mode": {
                     "standby": true
                 },
@@ -280,6 +334,23 @@
             $scope.nakabaluna = false;
             $scope.buhaton = false;
 
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+
+                     $timeout(function() {
+                    $scope.botarea = true;
+                     $scope.loginbutton = false;
+
+
+                });
+                    console.log($scope.botarea);
+
+
+                } else {
+                    $scope.botarea = true;
+                }
+
+            });
             var ai = "RxAI";
             $scope.inputcommand = function() {
 
@@ -322,8 +393,8 @@
                             $scope.RxAI.buhat.restart();
                             console.log($scope.RxAI);
                             $scope.messages.push({
-                            	messenger: ai,
-                            	message: "I am restarting, see you!!"
+                                messenger: ai,
+                                message: "I am restarting, see you!!"
                             });
 
                         } else {
@@ -352,7 +423,7 @@
                                     console.log("buhaton", $scope.buhaton)
 
                             }
-                            
+
                         }
 
 
