@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html ng-app="rxAi">
+<title>
+    RxIdentify
+</title>
+
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <style>
+    #contentArea {
+        width: 500px;
+        height: 500px;
+    }
+    
+    #contentArea {
+        margin: 200px;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+</head>
+
+<body ng-controller="MainCtrl">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">RxIdentify</a>
+            </div>
+        </div>
+    </nav>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <div class="row">
+                <div class="messageArea jumbotron">
+                    <div class="row" ng-repeat="messages in messages">
+                        <strong>{{messages.messenger}}:</strong>{{messages.message}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <form>
+                    <div class="form-group">
+                        <input type="text" ng-model="input" placeholder="Identify" class="form-control col-lg-12">
+                        <button ng-click="inputcommand()">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Example row of columns -->
+        <hr>
+        <footer>
+            <p>&copy; 2016 AdriSoft, Inc.</p>
+        </footer>
+    </div>
+    <!-- /container -->
+    <script>
+    angular.module('rxAi', [])
+        .controller('MainCtrl', function($scope) {
+
+            word = {
+                "Noun": {
+                    "description": "identifier of a word",
+                    "property": {
+                        "person": {},
+                        "thing": {},
+                        "idea": {},
+                        "quality": {},
+                        "state": {},
+                        "animal": {},
+                        "number": {
+                            "description": "an arithmetical value, expressed by a word, symbol, or figure, representing a particular quantity and used in counting and making calculations and for showing order in a series or for identification.",
+                            "property": {
+                                "0": {},
+                                "1": {},
+                                "2": {},
+                                "3": {},
+                                "4": {},
+                                "5": {},
+                                "6": {},
+                                "7": {},
+                                "8": {},
+                                "9": {},
+                                "0": {},
+                            },
+                            "command": {},
+                        },
+                        "letter": {
+                            "description": "a character representing one or more of the sounds used in speech; any of the symbols of an alphabet.",
+                            "property": {
+                                "a": {},
+                                "b": {},
+                                "c": {},
+                                "d": {},
+                                "e": {},
+                                "f": {},
+                                "g": {},
+                                "h": {},
+                                "i": {},
+                                "j": {},
+                                "k": {},
+                                "l": {},
+                                "m": {},
+                                "n": {},
+                                "o": {},
+                                "p": {},
+                                "q": {},
+                                "r": {},
+                                "s": {},
+                                "t": {},
+                                "u": {},
+                                "v": {},
+                                "w": {},
+                                "x": {},
+                                "y": {},
+                                "z": {},
+                            },
+                            "command": {
+                                "verify": function(remdata) {
+                                    remdata = this.remdata;
+                                    for (var i = Object.keys(word.Noun.property.letter.property).length - 1; i >= 0; i--) {
+                                        if (remdata == Object.keys(word.Noun.property.letter.property)[i]) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "example": {
+                        "a person (man, girl, engineer, friend)": {},
+                        "a thing (horse, wall, flower, country)": {},
+                        "an idea, quality, or state (anger, courage, life, luckiness)": {},
+                    }
+                },
+                "Verb": {
+                    "description": "A verb describes what a person or thing does or what happens",
+                    "property": {
+                        "action": {
+                            "add": {
+                                "word": true,
+                                "command": {
+                                    "perform": function(a, b) {
+                                        return a + b;
+                                    }
+                                }
+                            }
+                        },
+                        "event": {},
+                        "situation": {},
+                        "change": {}
+                    }
+                },
+                "Adjective": {
+                    "description": "An adjective is a word that describes a noun, giving extra information",
+                    "example": {
+                        "an exciting adventure": {},
+                        "a green apple": {},
+                        "a tidy room": {}
+                    }
+                },
+                "Adverb": {
+                    "description": "An adverb is a word that’s used to give information about a verb, adjective, or other adverb",
+                    "example": {
+                        "they sang loudly": {},
+                        "she’s very pretty": {},
+                        "he writes really well": {}
+                    }
+
+                },
+                "Pronouns": {
+                    "description": "Pronouns are used in place of a noun that is already known or has already been mentioned. This is often done in order to avoid repeating the noun.",
+                    "example": {
+                        "Laura left early because she was tired.": {},
+                        "Anthony brought the avocados with him.": {},
+                        "That is the only option left.": {},
+                        "Something will have to change.": {},
+                    }
+                },
+                "Preposition": {
+                    "description": "A preposition is a word such as after, in, to, on, and with. Prepositions are usually used in front of nouns or pronouns and they show the relationship between the noun or pronoun and other words in a sentence. They describe, for example, the position of something, the time when something happens, or the way in which something is done.",
+                },
+                "Conjunction": {
+                    "description": "A conjunction (also called a connective) is a word such as and, because, but, for, if, or, and when. Conjunctions are used to connect phrases, clauses, and sentences.The two main kinds are known as coordinating conjunctions and subordinating conjunctions.",
+                },
+                "Determiner": {
+                    "description": "A determiner is a word that introduces a noun, such as a/an, the, every, this, those, or many (as in a dog, the dog, this dog, those dogs, every dog, many dogs). ",
+
+                },
+                "Exclamation": {
+                    "description": "An exclamation (also called an interjection) is a word or phrase that expresses strong emotion, such as surprise, pleasure, or anger. Exclamations often stand on their own, and in writing they are usually followed by an exclamation mark rather than a full stop"
+                }
+
+            }
+
+
+            var words = {
+                "Rex": {
+                    "Noun": {
+                        "Person": true
+                    }
+                },
+                "dog": {
+                    "Noun": {
+                        "animal": true
+                    }
+                },
+                "yes": {
+                    "Exclamation": {
+                        "boolean": true
+                    }
+                },
+                "no": {
+                    "Exclamation": {
+                        "boolean": false,
+                    }
+                },
+                "a": {
+                    "Noun": {
+                        "letter": true
+                    }
+                },
+                "Fan": {
+                    "Noun": {
+                        "thing": true
+                    }
+                },
+
+            };
+
+
+
+            $scope.messages = [{
+                "messenger": "RxAI",
+                "message": "Unsa imo gusto e identify?"
+            }];
+
+            
+
+
+
+            $scope.RxAI = {
+            	"neurons":{
+
+            	},
+                "mode": {
+                    "standby": true
+                },
+                "buhat": {
+                    "restart": function() {
+                        $scope.RxAI.Tinuod = false;
+                        $scope.sugodStorya = false;
+                        $scope.nangutana = false;
+                        $scope.nakapangutana = false;
+                        $scope.walaynakita = true;
+                        $scope.nakabaluna = false;
+                        $scope.buhaton = {};
+                        $scope.buhaton = false;
+                    }
+                }
+            }
+
+            $scope.RxAI.Tinuod = false;
+            $scope.sugodStorya = false;
+            $scope.nangutana = false;
+            $scope.nakapangutana = false;
+            $scope.walaynakita = true;
+            $scope.nakabaluna = false;
+            $scope.buhaton = false;
+
+            var ai = "RxAI";
+            $scope.inputcommand = function() {
+
+
+
+                switch (this.input) {
+                    case "forget":
+                        $scope.sugodStorya = false;
+                        $scope.messages.push({
+                            messenger: ai,
+                            message: "Hungry, I need to eat information"
+                        })
+                        $scope.RxAI.buhat.restart();
+                        break;
+                    case "yes":
+                        console.log("Yess")
+                        console.log($scope.nangutana);
+                        $scope.messages.push({
+                            messenger: ai,
+                            message: "I need a Long term memory database.. Please Donate"
+                        });
+                        switch ($scope.nangutana) {
+                            case true:
+
+                                break;
+                            case false:
+                                $scope.messages.push({
+                                    messenger: ai,
+                                    message: "I did not ask anything yet"
+                                })
+                                $scope.messages.push({
+                                    messenger: ai,
+                                    message: "What's on your mind?"
+                                })
+                                $scope.nangutana = true;
+                        }
+                        break;
+                    case "no":
+                        if ($scope.nangutana == true) {
+                            $scope.RxAI.buhat.restart();
+                            console.log($scope.RxAI);
+                            $scope.messages.push({
+                            	messenger: ai,
+                            	message: "I am restarting, see you!!"
+                            });
+
+                        } else {
+                            switch ($scope.buhaton) {
+                                case "magpatudlo":
+                                    $scope.messages.push({
+                                        messenger: "you",
+                                        message: this.input
+                                    });
+
+                                    $scope.nireply = true;
+                                    message = "sad, but I still can hear";
+
+                                    break;
+                                case false:
+                                    $scope.messages.push({
+                                        messenger: ai,
+                                        message: "I did not ask anything yet"
+                                    })
+                                    $scope.messages.push({
+                                        messenger: ai,
+                                        message: "What's on your mind?"
+                                    })
+                                    break;
+                                default:
+                                    console.log("buhaton", $scope.buhaton)
+
+                            }
+                            
+                        }
+
+
+                        break;
+                    default:
+                        switch ($scope.nangutana) {
+                            case true:
+                                console.log("On que");
+                            case false:
+                                console.log("Pangutana na!");
+
+
+
+                                if ($scope.nakapangutana == true) {
+                                    console.log("Nangutana na man ka.. answeri sa");
+
+                                } else {
+                                    for (var i = Object.keys(words).length - 1; i >= 0; i--) {
+
+
+                                        switch (Object.keys(words)[i]) {
+                                            case this.input:
+                                                console.log(words[Object.keys(words)[i]]);
+
+                                                function identifyWordPropertyValue(rem) {
+                                                    Yabi = Object.keys(rem);
+                                                    Yabii = Object.keys(rem[Yabi])
+                                                    return Yabii;
+                                                }
+
+                                                $scope.messages.push({
+                                                    messenger: "You",
+                                                    message: this.input
+                                                })
+                                                $scope.messages.push({
+                                                    messenger: ai,
+                                                    message: 'is a ' + identifyWordPropertyValue(words[Object.keys(words)[i]]),
+                                                })
+                                                $scope.messages.push({
+                                                    messenger: ai,
+                                                    message: 'Do you agree?',
+                                                })
+                                                $scope.nangutana = true;
+                                                $scope.nakapangutana = true;
+                                                $scope.walaynakita = false;
+                                                $scope.nakabaluna = true;
+                                                $scope.buhaton = "magpaconfirm";
+                                                break;
+                                            default:
+                                                $scope.walaynakita = false;
+
+                                        }
+
+
+
+                                    };
+
+
+                                    console.log("nakita", $scope.walaynakita)
+                                    if ($scope.walaynakita == false && $scope.nakabaluna == false && $scope.nakapangutana == false) {
+                                        switch ($scope.nangutana) {
+                                            case true:
+                                                console.log("nakapangutana na man ka!");
+                                            case false:
+                                                console.log("nakabaluna", $scope.nakabaluna);
+                                                $scope.messages.push({
+                                                    messenger: "you",
+                                                    message: this.input
+                                                });
+                                                $scope.messages.push({
+                                                    messenger: ai,
+                                                    message: "I don't know what is " + this.input + " yet"
+                                                });
+                                                $scope.nangutana = true;
+                                                $scope.buhaton = "magpatudlo";
+                                                console.log("RxAI-mode", $scope.buhaton);
+                                                $scope.messages.push({
+                                                    messenger: ai,
+                                                    message: "Can you teach me what is " + this.input + "?"
+                                                });
+                                                $scope.nakapangutana = true;
+
+                                        }
+
+
+
+                                    }
+                                }
+
+
+
+
+
+
+                        }
+
+                }
+
+
+
+            }
+
+
+
+        });
+    </script>
+
+    <body>
+
+</html>
