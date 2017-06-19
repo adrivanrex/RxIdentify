@@ -367,14 +367,16 @@
                         break;
                     case "yes":
                         console.log("Yess")
-                        console.log($scope.nangutana);
-                        $scope.messages.push({
-                            messenger: ai,
-                            message: "I need a Long term memory database.. Please Donate"
-                        });
+                        switch ($scope.patubagon) {
+                            case true:
+                            console.log("tubaga ang unang pangutana!");
+                        }
                         switch ($scope.nangutana) {
                             case true:
-
+                                $scope.buhaton = "mangutana";
+                                console.log(Object.keys(word.Noun.property));
+                                $scope.messages.push({messenger:ai,message:"Is it a "+Object.keys(word.Noun.property)+"?"});
+                                $scope.patubagon = true;
                                 break;
                             case false:
                                 $scope.messages.push({
@@ -387,6 +389,7 @@
                                 })
                                 $scope.nangutana = true;
                         }
+
                         break;
                     case "no":
                         if ($scope.nangutana == true) {
@@ -420,7 +423,7 @@
                                     })
                                     break;
                                 default:
-                                    console.log("buhaton", $scope.buhaton)
+
 
                             }
 
@@ -438,7 +441,36 @@
 
 
                                 if ($scope.nakapangutana == true) {
-                                    console.log("Nangutana na man ka.. answeri sa");
+                                    if($scope.patubagon == true){
+                                        switch (this.input) {
+                                            case "number":
+                                                console.log("it is a number");
+                                                break;
+                                            case "animal":
+                                            console.log("it is a animal");
+                                                break;
+                                            case "state":
+                                            console.log("it is a state");
+                                                break;
+                                            case "quality":
+                                            console.log("it is a quality");
+                                                break;
+                                            case "idea":
+                                            console.log("it is a idea");
+                                                break;
+                                            case "thing":
+                                            console.log("it is a thing");
+                                                break;
+                                            case "person":
+                                            console.log("it is a person");
+                                                break;
+                                            case "letter":
+                                            
+                                            console.log("it is a letter");
+
+                                        }
+                                        $scope.nitubag == true;
+                                    }
 
                                 } else {
                                     for (var i = Object.keys(words).length - 1; i >= 0; i--) {
